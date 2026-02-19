@@ -8,11 +8,11 @@ export const auth = betterAuth({
         provider: "postgresql", // or "mysql", "postgresql", ...etc
     }),
 
-     emailAndPassword: {
+    emailAndPassword: {
         enabled: true,
     },
 
-     user: {
+    user: {
         additionalFields: {
             role: {
                 type: "string",
@@ -45,6 +45,15 @@ export const auth = betterAuth({
             },
         }
     },
+
+    session: {
+        expiresIn: 60 * 60 * 60 * 24, // 1 day in seconds
+        updateAge: 60 * 60 * 60 * 24, // 1 day in seconds
+        cookieCache: {
+            enabled: true,
+            maxAge: 60 * 60 * 60 * 24, // 1 day in seconds
+        }
+    }
 
     // trustedOrigins: [process.env.BETTER_AUTH_URL || "http://localhost:5000"],
 
