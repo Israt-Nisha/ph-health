@@ -1,7 +1,7 @@
 import { Router } from "express";
-// import { validateRequest } from "../../middleware/validateRequest";
 import { UserController } from "./user.controller";
-// import { createDoctorZodSchema } from "./user.validation";
+import { validateRequest } from "../../middleware/validationRequest";
+import { createDoctorZodSchema } from "./user.validation";
 
 
 
@@ -9,7 +9,7 @@ import { UserController } from "./user.controller";
 const router = Router();
 
 
-// router.post("/create-doctor",
+router.post("/create-doctor",
 
 //     //     (req: Request, res: Response, next: NextFunction) => {
 
@@ -26,11 +26,10 @@ const router = Router();
 
 //     // }, 
 
-//     validateRequest(createDoctorZodSchema),
+    validateRequest(createDoctorZodSchema),
 
-//     UserController.createDoctor);
+    UserController.createDoctor);
 
-router.post("/create-doctor", UserController.createDoctor)
 // router.post("/create-admin", UserController.createDoctor);
 // router.post("/create-superadmin", UserController.createDoctor);
 
