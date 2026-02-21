@@ -2,7 +2,8 @@ import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { prisma } from "./prisma";
 import { Role, UserStatus } from "../../generated/prisma/enums";
-import { bearer } from "better-auth/plugins";
+import { bearer, emailOTP } from "better-auth/plugins";
+import { sendEmail } from "../utils/email";
 
 export const auth = betterAuth({
     database: prismaAdapter(prisma, {
@@ -11,6 +12,13 @@ export const auth = betterAuth({
 
     emailAndPassword: {
         enabled: true,
+        requireEmailVerification: true,
+    },
+
+     emailVerification:{
+        sendOnSignUp: true,
+        sendOnSignIn: true,
+        autoSignInAfterVerification: true,
     },
 
     user: {
@@ -49,50 +57,50 @@ export const auth = betterAuth({
 
      plugins: [
         bearer(),
-        // emailOTP({
-        //     overrideDefaultEmailVerification: true,
-        //     async sendVerificationOTP({email, otp, type}) {
-        //         if(type === "email-verification"){
-        //           const user = await prisma.user.findUnique({
-        //             where : {
-        //                 email,
-        //             }
-        //           })
+        emailOTP({
+            overrideDefaultEmailVerification: true,
+            async sendVerificationOTP({email, otp, type}) {
+                if(type === "email-verification"){
+                  const user = await prisma.user.findUnique({
+                    where : {
+                        email,
+                    }
+                  })
                   
-        //           if(user && !user.emailVerified){
-        //             sendEmail({
-        //                 to : email,
-        //                 subject : "Verify your email",
-        //                 templateName : "otp",
-        //                 templateData :{
-        //                     name : user.name,
-        //                     otp,
-        //                 }
-        //             })
-        //           }
-        //         }else if(type === "forget-password"){
-        //             const user = await prisma.user.findUnique({
-        //                 where : {
-        //                     email,
-        //                 }
-        //             })
+                  if(user && !user.emailVerified){
+                    sendEmail({
+                        to : email,
+                        subject : "Verify your email",
+                        templateName : "otp",
+                        templateData :{
+                            name : user.name,
+                            otp,
+                        }
+                    })
+                  }
+                }else if(type === "forget-password"){
+                    const user = await prisma.user.findUnique({
+                        where : {
+                            email,
+                        }
+                    })
 
-        //             if(user){
-        //                 sendEmail({
-        //                     to : email,
-        //                     subject : "Password Reset OTP",
-        //                     templateName : "otp",
-        //                     templateData :{
-        //                         name : user.name,
-        //                         otp,
-        //                     }
-        //                 })
-        //             }
-        //         }
-        //     },
-        //     expiresIn : 2 * 60, // 2 minutes in seconds
-        //     otpLength : 6,
-        // })
+                    if(user){
+                        sendEmail({
+                            to : email,
+                            subject : "Password Reset OTP",
+                            templateName : "otp",
+                            templateData :{
+                                name : user.name,
+                                otp,
+                            }
+                        })
+                    }
+                }
+            },
+            expiresIn : 2 * 60, // 2 minutes in seconds
+            otpLength : 6,
+        })
     ],
 
     session: {
