@@ -3,17 +3,21 @@ import status from "http-status";
 import { DoctorService } from "./doctor.service";
 import { catchAsync } from "../../sheard/catchAsync";
 import { sendResponse } from "../../sheard/sendResponse";
+import { IQueryParams } from "../../interfaces/query.interface";
 
 const getAllDoctors = catchAsync(
     async (req: Request, res: Response) => {
 
-        const result = await DoctorService.getAllDoctors();
+         const query = req.query;
+
+        const result = await DoctorService.getAllDoctors(query as IQueryParams);
 
         sendResponse(res, {
             httpStatusCode: status.OK,
             success: true,
             message: "Doctors fetched successfully",
-            data: result,
+            data: result.data,
+            meta: result.meta,
         })
     }
 )
